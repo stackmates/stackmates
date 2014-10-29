@@ -1,0 +1,31 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+
+  config.vm.box = "phusion/ubuntu-14.04-amd64"
+
+  config.vm.network "private_network",
+          ip: "172.12.8.156"
+
+  config.vm.synced_folder "../../stackmates", "/experiment"
+
+  # plugin conflict
+  if Vagrant.has_plugin?("vagrant-vbguest") then
+      config.vbguest.auto_update = false
+  end
+
+  # SETUP
+  # config.vm.provision "shell", path: "provision.sh"
+  # config.vm.provision "file", source: "fig.yml", destination: "fig.yml"
+  # config.vm.provision "file", source: "Dockerfile", destination: "Dockerfile"
+  # config.vm.provision "file", source: "supervisord.conf", destination: "supervisord.conf"
+
+  # pkg_cmd = "fig run web npm install ; fig up -d"
+  # config.vm.provision "shell", inline: pkg_cmd, run: "always"
+
+end
