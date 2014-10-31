@@ -33,17 +33,17 @@ https://www.virtualbox.org/wiki/Downloads
 ## Source code / project structure
 
 
-stackmates
-    boxes
-    stackmates
-        client
-            src
-                common
-                [app domain]
-        services
-            src
-                common
-                [app domain]
+* stackmates
+    * boxes
+    * stackmates
+        * client
+            * src
+                * common
+                * [app domain]
+        * services
+            * src
+                * common
+                * [app domain]
 
 
 
