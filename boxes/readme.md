@@ -1,7 +1,7 @@
 
 # Goal
 
-Test monolith backend deployment ready production on debian box
+Suss out docker development to production workflow and chart out evolution of ideas from basic to more complex
 
 ## Issues
 
@@ -68,7 +68,9 @@ https://github.com/stackmates/stackmates.client.project [your-domain]
 
 
 
-## Prepare machine
+## Choose a box and prepare machine
+
+Using debian as this is used on google cloud.
 
 ```
 vagrant up
