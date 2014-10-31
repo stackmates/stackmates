@@ -1,7 +1,15 @@
+## Issues
+
+On my machine fig install works on phusion_experiments
+
+But on debian 7.7 created today fig build has a problem connnecting to mongo with ip address
+
+This build process worked fine on debian 7.4 yesterday.
+
 
 ## Goal
 
-Test basic monolith deployment to production on debian box
+Test monolith backend deployment to production on debian box
 
 
 ## Prepare machine
@@ -26,7 +34,10 @@ sudo apt-get install -t wheezy-backports linux-image-amd64
 
 get around permissions problem
 
-sudo bash -c "curl -sL https://deb.nodesource.com/setup | bash -"
+```
+sudo bash -c "curl -sSL https://get.docker.com/ | sh"
+```
+
 
 
 ### Install fig
@@ -68,11 +79,11 @@ sudo vi Dockerfile
 Edit Dockerfile replacing [app_your_secret_source] as appropriate
 
 
+```
 docker build -t drmg/nodeapp .
-
+```
 
 make sure npm install works properly
-
 
 
 ## Edit  fig.yml
@@ -82,17 +93,15 @@ image: drmg/nodeapp
 SET IP Address for mongo and Elasticsearch, make sure ip address matches host machines for mongo (read about this)
 
 
-
-
 ## Start the service
 
-fig up
-
+```
+sudo fig up
+```
 
 Check that browser http://172.12.8.162:4000/salestax  returns (your ip)
 
 {"total":123}
-
 
 
 
@@ -122,19 +131,20 @@ sudo rm /etc/nginx/sites-enabled/default
 * Should npm install be run in the Dockerfile?
 
 
-
 # Steps for GCE
 
 
-server {
-    listen 80;
-    server_name site.stackmates.dev ~^site.stackmates.dev\.(.*)\.xip\.io;
 
-    root /var/stackmates/siteHome/www;
-    index index.html index.htm;
+# Local Development
 
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-}
+## Hosts
 
+on mac
+
+/private/etc/hosts
+
+
+172.12.8.170  localdev
+
+
+sudo docker run -d -p 8000:80 --name website -v $PWD/www:/var/www/stackmates stackmates/sitehome
