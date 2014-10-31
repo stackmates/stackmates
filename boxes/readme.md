@@ -1,3 +1,8 @@
+
+# Goal
+
+Test monolith backend deployment ready production on debian box
+
 ## Issues
 
 On my machine fig install works on phusion_experiments
@@ -6,13 +11,70 @@ But on debian 7.7 created today fig build has a problem connnecting to mongo wit
 
 This build process worked fine on debian 7.4 yesterday.
 
+*Is this because a change in fig?*
 
-## Goal
 
-Test monolith backend deployment to production on debian box
+
+## Vagrant and Docker
+
+### Install
+
+Vagrant :
+```
+https://www.vagrantup.com/downloads
+```
+
+Virtualbox:
+```
+https://www.virtualbox.org/wiki/Downloads
+```
+
+
+## Source code / project structure
+
+
+stackmates
+    boxes
+    stackmates
+        client
+            src
+                common
+                [app domain]
+        services
+            src
+                common
+                [app domain]
+
+
+
+```
+git clone https://github.com/stackmates/stackmates
+cd stackmates/stackmates
+```
+
+Backend
+```
+git clone https://github.com/stackmates/common.services services
+cd services/src
+git clone https://github.com/stackmates/app_secret_sauce app_[your-domain]
+```
+
+Client
+```
+git clone https://github.com/stackmates/common.client.build client
+cd services/src/domain
+https://github.com/stackmates/stackmates.client.project [your-domain]
+```
+
 
 
 ## Prepare machine
+
+```
+vagrant up
+vagrant ssh
+```
+
 
 ```
 sudo vi /etc/apt/sources.list
@@ -42,32 +104,30 @@ sudo bash -c "curl -sSL https://get.docker.com/ | sh"
 
 ### Install fig
 
-
+```
 sudo apt-get install python-pip
-
 sudo pip install -U fig
-
-OR
-
-sudo bash -c "curl -L https://github.com/docker/fig/releases/download/1.0.0/fig-`uname -s`-`uname -m` > /usr/local/bin/fig;"
-
-chmod u+x /usr/local/bin/fig
+```
 
 
+## Services
 
+```
+ cd /host/services/src/app_[your-domain]
+```
 
+or
 
-# Services
-
-## Fetch source code
+#### Fetch source code (mock production)
 
 ```
 sudo mkdir var/www
-cd var/www/
+cd usr/share/
 sudo git clone https://github.com/stackmates/common.services  services
 cd services/src
-sudo git clone https://bitbucket.org/dreamineering/app_drmg
+sudo git clone https://[your-domain-source]
 ```
+
 
 ## Create image
 
@@ -78,19 +138,30 @@ sudo vi Dockerfile
 
 Edit Dockerfile replacing [app_your_secret_source] as appropriate
 
-
 ```
-docker build -t drmg/nodeapp .
+docker build -t [your-domain]/services .
 ```
 
 make sure npm install works properly
 
 
-## Edit  fig.yml
+## Edit fig.yml
 
-image: drmg/nodeapp
+### Set image name
 
-SET IP Address for mongo and Elasticsearch, make sure ip address matches host machines for mongo (read about this)
+image: [your-domain]/services
+
+
+### Set environment variables
+
+  environment:
+    NODE_ENV: development
+    PORT: 4000
+    ES_URL: http://xxx.xx.x.xxx:9200
+    MONGODB_URL: xxx.xx.x.xxx
+    MONGODB_PORT: 27017
+
+SET IP Address for mongo and Elasticsearch, make sure ip address matches host machines for mongo **This is where problem lies with mongo connection**
 
 
 ## Start the service
@@ -99,52 +170,63 @@ SET IP Address for mongo and Elasticsearch, make sure ip address matches host ma
 sudo fig up
 ```
 
-Check that browser http://172.12.8.162:4000/salestax  returns (your ip)
+Check that browser http://172.xx.x.xxx:4000/salestax  returns (your ip)
 
 {"total":123}
 
 
 
-# Client
+# Client build
+
+development;
+```
+cd /host/client/src/domain/stackmates/_deploy/[subdomain]
+```
+
+production
+```
+sudo mkdir var/www/
+git clone [your domain client]
+```
+
+```
+sudo build -t [domain]/[subdomain] .
+sudo docker run -d -p 8000:80 --name website -v $PWD/www:/var/www/stackmates stackmates/sitehome
+```
+
+
+### For mac
+
+
+```
+vim /private/etc/hosts
+```
+
+Edit hosts with your ip
+
+xxx.xx.x.xxx  localdev
+
+## Browse to
+
+```
+http://localdev:8000
+```
+
+
+Want to get this working
 
 http://jasonwilder.com/blog/2014/03/25/automated-nginx-reverse-proxy-for-docker/
 
-```
-sudo mkdir var/www/client
-git clone https://github.com/stackmates/stackmates.client.project
-```
+
+# Steps to get running on Google Cloud
+
+Should hopefully be the same as above *except for the mongo connection bit*
 
 
-sudo ln -s /etc/nginx/sites-available/example.conf /etc/nginx/sites-enabled/example.conf
-
-sudo service nginx reload
-
-sudo nginx -t && service nginx reload
-
-
-sudo chown -R www-data:www-data /var/www/example.com/public_html
-
-sudo rm /etc/nginx/sites-enabled/default
 
 # Questions
 
 * Should npm install be run in the Dockerfile?
 
 
-# Steps for GCE
 
-
-
-# Local Development
-
-## Hosts
-
-on mac
-
-/private/etc/hosts
-
-
-172.12.8.170  localdev
-
-
-sudo docker run -d -p 8000:80 --name website -v $PWD/www:/var/www/stackmates stackmates/sitehome
