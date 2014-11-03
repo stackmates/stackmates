@@ -186,7 +186,7 @@ sudo mkdir var/www/
 git clone [your domain client]
 ```
 
-sudo build -t [domain]/[subdomain] .
+
 
 ```
 sudo docker build -t stackmates/sitehome .

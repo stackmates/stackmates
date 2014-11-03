@@ -2,12 +2,9 @@
 ## Deploy to google cloud
 
 
-
-
 ```
 gcloud auth login
 ```
-
 
 set project id
 ```
@@ -105,7 +102,13 @@ need
 ### Core requirements
 ```
 sudo apt-get update
+```
+
+### Nginx
+
+```
 sudo apt-get install nginx
+sudo service nginx start
 ```
 
 
@@ -116,15 +119,15 @@ sudo apt-get install -y python-pip
 sudo pip install -U fig
 ```
 
-
-### Source
-
+### Source Directory
 
 ```
 sudo mkdir /stackmates && cd /stackmates
 ```
 
-Backend
+
+### Backend
+
 ```
 sudo git clone https://github.com/stackmates/common.services services
 cd services/src
@@ -149,13 +152,13 @@ Set NODE_ENV production
 sudo vi fig.yml
 ```
 
-## Build image
+### Build image
 
 ```
 sudo docker build -t <domain>/services .
 ```
 
-## Fig up
+### Fig up
 
 check the service
 ```
@@ -184,6 +187,100 @@ with
 ```
 
 **TODO** Figure out where to access logs
+
+
+
+## Client build
+
+
+### Setup nginx
+
+edit /etc/nginx/nginx.conf
+
+```
+user www-data;
+worker_processes 4;
+pid /run/nginx.pid;
+daemon off;
+
+events {}
+
+http {
+  sendfile on;
+  tcp_nopush on;
+  keepalive_timeout 65;
+  types_hash_max_size 2048;
+  include /etc/nginx/mime.types;
+  default_type application/octet-stream;
+  access_log /var/log/nginx/access.log;
+  error_log /var/log/nginx/error.log;
+  gzip on;
+  gzip_disable "msie6";
+
+  ##
+  # Virtual Host Configs
+  ##
+  include /etc/nginx/conf.d/*.conf;
+  include /etc/nginx/sites-enabled/*;
+
+}
+```
+
+add to sites available
+
+```
+sudo vi /etc/ngnix/
+```
+
+```
+server {
+  server_name stackmat.es www.stackmat.es;
+
+  location / {
+       proxy_pass http://localhost:8000;
+  }
+
+}
+```
+
+```
+sudo ln -s /etc/nginx/sites-available/global.conf /etc/nginx/sites-enabled/global.conf
+```
+
+test and reload nginx config
+```
+sudo nginx -t -s reload
+```
+
+
+```
+sudo mkdir /stackmates/client
+cd /stackmates/client
+```
+
+Get code
+
+```
+sudo git clone https://github.com/[your-frontend-footprint] <your-domain>
+```
+
+Setup deployment of home page
+
+```
+cd <your-domain>/_deploy/site_home
+```
+
+
+### build the image
+
+```
+sudo fig up
+```
+
+
+
+
+
 
 
 ## Reference material
