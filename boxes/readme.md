@@ -1,21 +1,10 @@
 
 # Goal
 
-Suss out docker development to production workflow and chart out evolution of ideas from basic to more complex
-
-## Issues
-
-On my machine fig install works on phusion_experiments
-
-But on debian 7.7 created today fig build has a problem connnecting to mongo with ip address
-
-This build process worked fine on debian 7.4 yesterday.
-
-*Is this because a change in fig?*
+Suss out docker development to production workflow and chart out evolution of ideas from basic to more complex.
 
 
-
-## Vagrant and Docker
+## Vagrant and Virtual box
 
 ### Install
 
@@ -27,11 +16,25 @@ https://www.vagrantup.com/downloads
 Virtualbox:
 ```
 https://www.virtualbox.org/wiki/Downloads
-```
+
+
+## Prepare box
+
+Refer to specific box instructions
+
+Debian is used on google cloud but has issue with docker and synching files on reboot.
 
 
 ## Source code / project structure
 
+Create structure above in production do this directly inside the box. In development if you follow this structure source code will be under /host directory.
+
+
+For the client this stucture allows having one build system for multiple sites with the idea this can increase efficiencies in build tool mainetenance and discovering patterns to be extracted into smaller modules.
+
+On server side this is more about hiding the value code from common domain knowledge. But folder structure in terms of intended MSA implementation is merely for helping to communicate schema and intent.
+
+The goal is to analyse these structure and determine a taxonomy for naming service and modules that helps to communicate role and to find when not in this stucture.
 
 * stackmates
     * boxes
@@ -67,42 +70,28 @@ https://github.com/stackmates/stackmates.client.project [your-domain]
 ```
 
 
-
-## Choose a box and prepare machine
-
-Using debian as this is used on google cloud.
-
-```
-vagrant up
-vagrant ssh
+Get docker
 ```
 
 
-```
-sudo vi /etc/apt/sources.list
-```
-
-Add the following line
-
-```
-deb http://http.debian.net/debian wheezy-backports main
 ```
 
 ```
 sudo apt-get update
-sudo apt-get install -t wheezy-backports linux-image-amd64
+sudo apt-get -y install nodejs npm
+sudo ln -s /usr/bin/nodejs /usr/bin/node
+sudo chown -R vagrant:vagrant /usr/local
+sudo chown -R vagrant:vagrant /var/run/docker.sock
+git config --global user.name "matt mischewski"
+git config --global user.email matt@dreamineering.com
+echo 'export DOCKER_HOST=tcp://127.0.0.1:4243' >> ~/.profile && . ~/.profile
 ```
 
-
-### Install docker
-
-get around permissions problem
-
+### Ubuntu
 ```
-sudo bash -c "curl -sSL https://get.docker.com/ | sh"
+curl -sSL https://get.docker.com/ | sh
+sudo usermod -aG docker vagrant
 ```
-
-
 
 ### Install fig
 
@@ -118,20 +107,7 @@ sudo pip install -U fig
  cd /host/services/src/app_[your-domain]
 ```
 
-or
-
-#### Fetch source code (mock production)
-
-```
-sudo mkdir var/www
-cd usr/share/
-sudo git clone https://github.com/stackmates/common.services  services
-cd services/src
-sudo git clone https://[your-domain-source]
-```
-
-
-## Create image
+### Create image
 
 ```
 sudo mv Dockerfile.sample Dockerfile
@@ -141,44 +117,56 @@ sudo vi Dockerfile
 Edit Dockerfile replacing [app_your_secret_source] as appropriate
 
 ```
-docker build -t [your-domain]/services .
+docker build -t [your-domain]/backend .
 ```
 
 make sure npm install works properly
 
 
-## Edit fig.yml
+### Edit fig.yml
 
-### Set image name
+Set image name
 
-image: [your-domain]/services
-
-
-### Set environment variables
-
-  environment:
-    NODE_ENV: development
-    PORT: 4000
-    ES_URL: http://xxx.xx.x.xxx:9200
-    MONGODB_URL: xxx.xx.x.xxx
-    MONGODB_PORT: 27017
-
-SET IP Address for mongo and Elasticsearch, make sure ip address matches host machines for mongo **This is where problem lies with mongo connection**
-
+```
+image: [your-domain]/backend
+```
 
 ## Start the service
 
 ```
-sudo fig up
+fig run web npm install && fig up
 ```
 
 Check that browser http://172.xx.x.xxx:4000/salestax  returns (your ip)
 
 {"total":123}
 
+*All Good?*
+
+```
+  fig up -d
+```
+
+*Else*
+
+Edit the fig.yml to replace supervisor with node app.js so you can see what the problem is
+
+replace
+```
+  command: /usr/bin/supervisord
+```
+
+with
+```
+  command: node app.js
+```
 
 
-# Client build
+
+# Client
+
+
+Build client apps
 
 development;
 ```
@@ -191,14 +179,16 @@ sudo mkdir var/www/
 git clone [your domain client]
 ```
 
-```
 sudo build -t [domain]/[subdomain] .
+
+```
+sudo docker build -t stackmates/sitehome .
 sudo docker run -d -p 8000:80 --name website -v $PWD/www:/var/www/stackmates stackmates/sitehome
 ```
 
+### Edit hosts
 
-### For mac
-
+If on a mac you can
 
 ```
 vim /private/etc/hosts
@@ -208,27 +198,34 @@ Edit hosts with your ip
 
 xxx.xx.x.xxx  localdev
 
+*Otherwise*
+
+Use http://nip.io/
+
+
 ## Browse to
 
 ```
 http://localdev:8000
 ```
 
-
-Want to get this working
-
-http://jasonwilder.com/blog/2014/03/25/automated-nginx-reverse-proxy-for-docker/
+Should be golden
 
 
-# Steps to get running on Google Cloud
+### Goals
 
-Should hopefully be the same as above *except for the mongo connection bit*
+Get this working
 
+* [Automated nginx reverse proxy for docker](http://jasonwilder.com/blog/2014/03/25/automated-nginx-reverse-proxy-for-docker/)
+* [Automagical deploys](http://nathanleclaire.com/blog/2014/08/17/automagical-deploys-from-docker-hub/)
+
+
+# Google Compute Engine
 
 
 # Questions
 
 * Should npm install be run in the Dockerfile?
-
+* Why is first docker upload fast but subsequent uploads in new location slow? How can it be proven that .dockerignore is working?
 
 

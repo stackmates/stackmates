@@ -12,12 +12,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network "private_network",
           ip: "172.12.8.156"
 
-  config.vm.synced_folder "../../stackmates", "/experiment"
+  config.vm.synced_folder "../../stackmates", "/stackmates"
 
   # plugin conflict
   if Vagrant.has_plugin?("vagrant-vbguest") then
       config.vbguest.auto_update = false
   end
+
+  # useful if need to resolve a boot issue
+  # config.vm.provider :virtualbox do |vb|
+  #   vb.gui = true
+  # end
 
   # SETUP
   # config.vm.provision "shell", path: "provision.sh"

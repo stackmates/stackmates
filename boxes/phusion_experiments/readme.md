@@ -1,0 +1,42 @@
+
+## Ubuntu 14:04
+
+```
+sudo apt-get update
+sudo apt-get install -y \
+    git \
+    libxml2-dev \
+    python \
+    build-essential \
+    make \
+    gcc \
+    python-dev \
+    locales \
+    python-pip \
+    supervisor
+```
+
+### Install node
+
+curl -sL https://deb.nodesource.com/setup | sudo bash -
+sudo apt-get install -y nodejs
+
+
+### Install docker
+
+```
+curl -sSL https://get.docker.com/ | sh
+sudo usermod -aG docker vagrant
+```
+
+### Install fig
+
+```
+sudo apt-get install python-pip
+sudo pip install -U fig
+```
+
+
+### References
+
+https://www.codementor.io/linux-tutorial/configure-linux-toolset-zsh-tmux-vim
