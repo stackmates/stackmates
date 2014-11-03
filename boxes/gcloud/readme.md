@@ -1,7 +1,7 @@
 
 ## Deploy to google cloud
 
-https://docs.docker.com/installation/google/
+
 
 
 ```
@@ -190,3 +190,5 @@ with
 
 * [From docker site](https://docs.docker.com/installation/google/)
 * [Quickstart](https://cloud.google.com/compute/docs/quickstart#create_an_instance)
+* [Containers in production with fig]( http://blog.docker.com/2014/08/orchestrating-docker-containers-in-production-using-fig/)
+
