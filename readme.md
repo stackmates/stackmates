@@ -3,12 +3,13 @@
 
 For exploring how browserify + micro services + docker can create faster more scalable solutions
 
-
 ## Foundations
 
 ### Philsophy
 
-* Explore contradictions
+Explore contradictions and have two competing yet opposite approaches. For example Angular HTML as DSL vs the other REACT type way. HAPI as the all in one versus micro
+
+Realtime vs REST
 
 
 ### Taxonomy

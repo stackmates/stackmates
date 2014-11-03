@@ -49,18 +49,25 @@ The goal is to analyse these structure and determine a taxonomy for naming servi
                 * [app domain]
 
 
-
+development
 ```
 git clone https://github.com/stackmates/stackmates
 cd stackmates/stackmates
 ```
 
+production
+```
+sudo mkdir /stackmates && cd /stackmates
+```
+
 Backend
 ```
-git clone https://github.com/stackmates/common.services services
+sudo git clone https://github.com/stackmates/common.services services
 cd services/src
 git clone https://github.com/stackmates/app_secret_sauce app_[your-domain]
 ```
+
+
 
 Client
 ```

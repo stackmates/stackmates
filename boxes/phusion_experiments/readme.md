@@ -32,11 +32,16 @@ sudo usermod -aG docker vagrant
 ### Install fig
 
 ```
-sudo apt-get install python-pip
+sudo apt-get install -y python-pip
 sudo pip install -U fig
 ```
 
-
 ### References
 
-https://www.codementor.io/linux-tutorial/configure-linux-toolset-zsh-tmux-vim
+[configure linux for development](https://www.codementor.io/linux-tutorial/configure-linux-toolset-zsh-tmux-vim)
+
+
+
+## Todo
+
+* [check out dockerize](http://jasonwilder.com/blog/2014/10/13/a-simple-way-to-dockerize-applications/)
